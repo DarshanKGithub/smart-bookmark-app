@@ -201,6 +201,113 @@ It demonstrates production patterns.
 
 ---
 
+## 🧩 Challenges Faced & How I Solved Them
+
+### 1️⃣ OAuth Login Working but No Redirect
+
+**Problem:**  
+After successful Google login, the app stayed on the login page instead of redirecting to the dashboard.
+
+**Cause:**  
+The session was being created, but middleware wasn’t properly validating and refreshing the auth session on the server side.
+
+**Solution:**  
+- Implemented Supabase server client inside `middleware.ts`
+- Used `supabase.auth.getUser()` to validate the session
+- Properly redirected authenticated users away from `/login`
+
+**What I Learned:**  
+Client-side auth is not enough in production apps. Server-side session validation is critical for security and proper routing.
+
+---
+
+### 2️⃣ Row Level Security (RLS) Blocking Queries
+
+**Problem:**  
+Insert and select queries were failing even though the table existed.
+
+**Cause:**  
+RLS was enabled, but policies were either missing or incorrect.
+
+**Solution:**  
+- Enabled RLS explicitly
+- Added `SELECT`, `INSERT`, and `DELETE` policies
+- Used `auth.uid() = user_id` to enforce ownership
+
+**What I Learned:**  
+Security must be enforced at the database layer, not only in frontend filters.
+
+---
+
+### 3️⃣ OAuth Working Locally but Failing in Production
+
+**Problem:**  
+Google login worked on localhost but failed after deploying to Vercel.
+
+**Cause:**  
+Supabase redirect URLs were not updated with the production domain.
+
+**Solution:**  
+- Added production URL to Supabase → Authentication → URL Configuration
+- Set correct redirect path: `/auth/callback`
+
+**What I Learned:**  
+OAuth requires strict domain configuration. Environment parity matters.
+
+---
+
+### 4️⃣ Realtime Not Updating UI
+
+**Problem:**  
+Database was updating but UI wasn’t reflecting changes instantly.
+
+**Cause:**  
+Supabase realtime subscription wasn’t properly subscribed to INSERT and DELETE events.
+
+**Solution:**  
+- Subscribed using `.channel()` and `postgres_changes`
+- Updated state inside callback
+- Cleaned up subscription on unmount
+
+**What I Learned:**  
+Realtime systems require careful subscription handling and cleanup to avoid memory leaks.
+
+---
+
+### 5️⃣ Slow UX During Inserts
+
+**Problem:**  
+Users had to wait for the database response before seeing new bookmarks.
+
+**Cause:**  
+UI was waiting for server confirmation before updating state.
+
+**Solution:**  
+Implemented **Optimistic UI**:
+- Temporarily added bookmark to local state
+- Synced with database in background
+- Rolled back on error
+
+**What I Learned:**  
+Perceived performance is as important as actual performance.
+
+---
+
+## 📚 Key Takeaways
+
+This project reinforced:
+
+- Importance of server-side authentication
+- Database-level security with RLS
+- Handling OAuth in production
+- Managing realtime subscriptions
+- Designing smooth user experience with optimistic updates
+- Structuring a full-stack app with proper separation of concerns
+
+---
+
+
+
 ## 👨‍💻 Author
 
 Your Name : Darshan Kshetri  
