@@ -20,7 +20,18 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen;
 }
+
+.glass-card {
+  @apply bg-white/70 backdrop-blur-lg border border-white/30 shadow-xl rounded-2xl;
+}
+
+.primary-btn {
+  @apply bg-black text-white px-4 py-2 rounded-xl transition hover:scale-105 hover:bg-slate-800;
+}
+
+.input-modern {
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-black transition;
+}
+
